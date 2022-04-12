@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>File Transfer Program</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="main.css">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" />
+        <script type="text/javascript" src=""></script>
+    </head>
+    <body>
+       
+        
+            <div class="container-login100" style="background-image: url('background2.jpeg');">
+                <div class="container">
+                <div class="jumbotron">
+                    <h1 class="display-3">File Transfer Program</h1><br>
+                    <p class="lead">Code for Choose File Button</p>
+                    <hr class="my-4">
+                    <pre>
+                        private void fileChooseButtonActionPerformed(java.awt.event.ActionEvent evt) {  <br>                                               
+                            JFileChooser chooser = new JFileChooser();<br>
+                            chooser.showOpenDialog(null);<br>
+                            file = chooser.getSelectedFile();<br>
+                            if(file != null){<br>
+                                String filepath = file.getAbsolutePath();<br>
+                                chosenFileName.setText(filepath);<br>
+                            }<br>
+                        }  <br>  
+
+                    </pre>
+
+                    <p class="lead">Code for Send Button</p>
+                    <hr class="my-4">
+                    <pre>
+                        private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {    <br>                                     
+                            //Socket code:<br>
+                            String ip = ipTextfield.getText();<br>
+                            if(ip.isEmpty() || ip == ""){<br>
+                                JOptionPane.showMessageDialog(this, "Please Enter the IP address.");<br>
+                                return;<br>
+                            }<br>
+                            try {<br>
+                                if(file == null){<br>
+                                    JOptionPane.showMessageDialog(this, "Please select a file.");<br>
+                                    return;<br>
+                                }<br>
+                                Socket socket = new Socket(ip,6666);<br>
+                                String filename = file.getName();<br>
+                                FileInputStream fileInputStream = new FileInputStream(file);<br>
+                                DataOutputStream dout = new DataOutputStream(socket.getOutputStream());<br>
+                                dout.writeUTF(filename);<br>
+                                dout.writeLong(file.length());<br>
+                                dout.flush();<br>
+                                int bytes = 0;<br>
+                                byte[] buffer = new byte[4*1024];<br>
+                                while((bytes = fileInputStream.read(buffer)) != -1){<br>
+                                    dout.write(buffer,0,bytes);<br>
+                                    dout.flush();<br>
+                                }<br>
+                                fileInputStream.close();<br>
+                                dout.close();<br>
+                                socket.close();<br>
+                                
+                            } catch (Exception ex) {<br>
+                                JOptionPane.showMessageDialog(this, ex.toString());<br>
+                            }<br>
+                        } <br>
+
+                    </pre>
+
+                    <p class="lead">Code for Receive Button:</p>
+                    <hr class="my-4">
+                    <pre>
+                        private void acceptButtonMouseClicked(java.awt.event.MouseEvent evt) {  <br>                                        
+                            // TODO add your handling code here:<br>
+                            statusLabel.setText("Waiting for sender. . .");<br>
+                            try {<br>
+                                ServerSocket ss = new ServerSocket(6666);<br>
+                                Socket socket = ss.accept();<br>
+                                statusLabel.setText("Receiving File. . .");<br>
+                                DataInputStream din = new DataInputStream(socket.getInputStream());<br>
+                                String filename = din.readUTF();<br>
+                                long filesize = din.readLong();<br>
+                                int bytes = 0;<br>
+                                long size = filesize;<br>
+                                FileOutputStream fileOutputStream = new FileOutputStream(filename);<br>
+                                byte[] buffer = new byte[4*1024];<br>
+                                while (size > 0 && (bytes = din.read(buffer, 0, (int)Math.min(buffer.length, size))) != -1) {<br>
+                                    fileOutputStream.write(buffer,0,bytes);<br>
+                                    size -= bytes;<br>
+                                }<br>
+                                fileOutputStream.close();<br>
+                                din.close();<br>
+                                socket.close();<br>
+                                ss.close();<br>
+                                statusLabel.setText("");<br>
+                                JOptionPane.showMessageDialog(this,"File saved.");<br>
+                            } catch (IOException ex) {<br>
+                                JOptionPane.showMessageDialog(this, ex.toString());<br>
+                            }<br>
+                        }<br>
+
+                    </pre>
+
+
+                </div>
+
+               
+				</div>
+			</div>
+            <?php
+            echo "hello";
+        ?>
+	</body>
+</html>
